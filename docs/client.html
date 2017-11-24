@@ -38,11 +38,12 @@
                 return service.getCharacteristic(characteristic);
             })
             .then(characteristic => {
-                document.getElementById('logs').innerHTML += 'Reading characteristic ' + characteristic.readValue() + "<br/>";
+                // document.getElementById('logs').innerHTML += 'Reading characteristic ' + characteristic.readValue() + "<br/>";
                 return characteristic.readValue();
             })
             .then(value => {
-                document.getElementById('logs').innerHTML += 'Characteristic…' + value + "<br/>";
+                value = value.buffer ? value : new DataView(value);
+                document.getElementById('logs').innerHTML += 'Characteristic…' + value.getUint8(0) + "<br/>";
             })
             .catch(exception => {
                 alert(exception);
