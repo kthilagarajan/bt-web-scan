@@ -1,0 +1,51 @@
+<h1>I am client</h1>
+<br/>
+<br/>
+<br/> Service Name : <input type="text" id="serviceName" />
+<br/>
+<br/>
+<br/> Characteristics Name : <input type="text" id="characteristic" />
+
+<br/>
+<br/>
+<button onclick="doSubscribe()">
+    Subscribe</button>
+<br/>
+<br/>
+<div id="logs"></div>
+
+
+<script>
+    function doSubscribe() {
+        var serviceName = document.getElementById("serviceName").value;
+        var characteristic = document.getElementById("characteristic").value;
+
+        navigator.bluetooth.requestDevice({
+                filters: [{
+                    services: [serviceName]
+                }]
+            }).then(device => {
+                document.getElementById('logs').innerHTML += 'Got device:' + device.name + "<br/>";
+                document.getElementById('logs').innerHTML += 'id:' + device.id + "<br/>";
+                return device.gatt.connect(); // Chromium 49 and below use `connectGATT()` but from Chromium 50 it will use gatt.connect();
+            })
+            .then(server => {
+                document.getElementById('logs').innerHTML += 'Getting ' + serviceName + ' Service…' + "<br/>";
+                return server.getPrimaryService(serviceName);
+            })
+            .then(service => {
+                document.getElementById('logs').innerHTML += 'Getting ' + characteristic + ' Characteristic…' + "<br/>";
+                return service.getCharacteristic(characteristic);
+            })
+            .then(characteristic => {
+                document.getElementById('logs').innerHTML += 'Reading characteristic ' + characteristic.readValue() + "<br/>";
+                return characteristic.readValue();
+            })
+            .then(value => {
+                document.getElementById('logs').innerHTML += 'Characteristic…' + value + "<br/>";
+            })
+            .catch(exception => {
+                alert(exception);
+            });
+    }
+</script>

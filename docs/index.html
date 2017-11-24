@@ -10,25 +10,29 @@
                 filters: [{
                     services: ['battery_service']
                 }]
+            }).then(device => {
+                console.log('Got device:', device.name);
+                console.log('id:', device.id);
+                return device.gatt.connect(); // Chromium 49 and below use `connectGATT()` but from Chromium 50 it will use gatt.connect();
             })
-            .then(device => device.gatt.connect())
             .then(server => {
-                // Getting Battery Service...
+                console.log('Getting Battery Service…');
                 return server.getPrimaryService('battery_service');
             })
             .then(service => {
-                // Getting Battery Level Characteristic...
+                console.log('Getting Battery Characteristic…');
                 return service.getCharacteristic('battery_level');
             })
             .then(characteristic => {
-                // Reading Battery Level...
+                console.log('Reading battery level…');
                 return characteristic.readValue();
             })
             .then(value => {
-                alert('Battery percentage is ' + value.getUint8(0));
+                value = value.buffer ? value : new DataView(value);
+                console.log('Battery percentage:', value.getUint8(0));
             })
-            .catch(error => {
-                alert(error);
+            .catch(exception => {
+                console.log(exception);
             });
     }
 </script>
